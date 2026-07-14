@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashley Samuelson | Voronoi Wallpaper Generator</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --panel-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --accent: #2196F3;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .sidebar {
+            width: 350px;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        a {
+            color: #66b2ff;
+        }
+
+        a:visited {
+            color: #b380ff;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* --- COLLAPSIBLE SECTIONS --- */
+        details {
+            background: #222;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #ddd;
+        }
+
+        details.help-section { border-left: 4px solid #8bc34a; }
+        details.io-section { border-left: 4px solid #FF9800; }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            outline: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .details-content {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #3d3d3d;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .details-content p { margin: 0; }
+
+        label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #aaa;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            background: #3d3d3d;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            width: 100%;
+            height: 110px;
+            background: #111;
+            color: #00E676;
+            border: 1px solid #555;
+            font-family: monospace;
+            font-size: 0.75rem;
+            padding: 8px;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .color-row {
+            background: #222;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #ccc;
+            font-weight: bold;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #3d3d3d;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+
+        .color-item input[type="color"] {
+            border: none;
+            width: 30px;
+            height: 25px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .color-item span {
+            flex-grow: 1;
+            font-family: monospace;
+        }
+
+        .row-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        button:hover { background: #1976D2; }
+        
+        button.secondary {
+            background: #444;
+            padding: 6px;
+            flex: 1;
+            font-size: 0.8rem;
+        }
+        button.secondary:hover { background: #555; }
+
+        button.danger {
+            background: #d32f2f;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+        button.danger:hover { background: #b71c1c; }
+
+        .status {
+            font-size: 0.85rem;
+            color: #8bc34a;
+            text-align: center;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Flag Generator</h2>
+        
+        <details class="help-section">
+            <summary>Help & Info</summary>
+            <div class="help-content">
+                <p>
+                    This app will generate a wallpaper based on a grid of colors.
+                    Specifically, the colors will be arranged in a grid, and the color of each pixel will be a blend of the closest color,
+                    the second closest color, and the furthest color to generate an interesting pattern.
+                    For more information on the math, look up <a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagrams</a>.
+                </p>
+                <p><strong>Auto-Rendering: </strong>Selecting any from the dropdown automatically renders the image wallpaper.</p>
+                <p><strong>Render Flag Button: </strong>
+                    Because the rendering is pixel-by-pixel, it can become slower at high resolutions, so custom edits (adding colors, rows, or resizing) do not render automatically.
+                    When you are done adjusting your custom layout, click <strong>Render Flag</strong> to generate your new wallpaper without freezing your browser during editing.
+                </p>
+            </div>
+        </details>
+
+        <div>
+            <label for="preset-select">Presets</label>
+            <select id="preset-select">
+                <option value="material">Multicolor</option>
+                <option value="gay">Rainbow</option>
+                <option value="trans">Pink and Blue</option>
+                <option value="usa">USA Flag</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <div>
+                <label for="input-width">Width (px)</label>
+                <input type="number" id="input-width" value="960" min="100" max="3840">
+            </div>
+            <div>
+                <label for="input-height">Height (px)</label>
+                <input type="number" id="input-height" value="540" min="100" max="2160">
+            </div>
+        </div>
+
+        <div>
+            <label>Color Rows Layout</label>
+        </div>
+        
+        <div class="color-list" id="color-list"></div>
+
+        <details class="io-section">
+            <summary>Import / Export Layout</summary>
+            <div class="details-content">
+                <label for="json-io">Layout JSON</label>
+                <textarea id="json-io" placeholder="Paste JSON layout here..."></textarea>
+                
+                <div class="row">
+                    <button class="secondary" id="apply-json-btn">Apply Text</button>
+                    <button class="secondary" id="copy-json-btn">Copy Text</button>
+                </div>
+                <div class="row" style="margin-top: 4px;">
+                    <button class="secondary" id="upload-json-btn">Upload .json</button>
+                    <button class="secondary" id="download-json-btn">Download .json</button>
+                </div>
+                <input type="file" id="file-input" accept=".json" style="display: none;">
+            </div>
+        </details>
+
+        <button id="render-btn" style="padding: 15px;">Render Flag</button>
+        <div class="status" id="status-text">Ready</div>
+    </div>
+
+    <div class="main-content">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const PRESETS = {
+            trans: [
+                ["#5dcdf5", "#5dcdf5", "#5dcdf5", "#5dcdf5", "#5dcdf5"],
+                ["#f7a9b7", "#f7a9b7", "#f7a9b7", "#f7a9b7", "#f7a9b7"],
+                ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                ["#f7a9b7", "#f7a9b7", "#f7a9b7", "#f7a9b7", "#f7a9b7"],
+                ["#5dcdf5", "#5dcdf5", "#5dcdf5", "#5dcdf5", "#5dcdf5"]
+            ],
+            gay: [
+                ["#ed2225", "#f79621", "#f1eb1b", "#0c9b49", "#3954a5", "#93298e"],
+                ["#ed2225", "#f79621", "#f1eb1b", "#0c9b49", "#3954a5", "#93298e"],
+                ["#ed2225", "#f79621", "#f1eb1b", "#0c9b49", "#3954a5", "#93298e"],
+                ["#ed2225", "#f79621", "#f1eb1b", "#0c9b49", "#3954a5", "#93298e"],
+                ["#ed2225", "#f79621", "#f1eb1b", "#0c9b49", "#3954a5", "#93298e"]
+            ],
+            usa: [
+                ["#F44336", "#F44336", "#F44336", "#F44336"],
+                ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
+                ["#2196F3", "#2196F3", "#2196F3", "#2196F3"]
+            ],
+            material: [
+                ["#C2185B", "#F8BBD0", "#FFFFFF", "#03A9F4"],
+                ["#FFEB3B", "#BDBDBD", "#DCEDC8", "#8BC34A", "#689F38"],
+                ["#455A64", "#607D8B", "#CFD8DC", "#BDBDBD", "#536DFE"],
+                ["#7C4DFF", "#B2DFDB", "#009688", "#00796B"],
+                ["#1976D2", "#2196F3", "#BBDEFB", "#757575", "#FF9800"]
+            ]
+        };
+
+        let currentColors = JSON.parse(JSON.stringify(PRESETS.material));
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const presetSelect = document.getElementById("preset-select");
+        const colorListEl = document.getElementById("color-list");
+        const widthInput = document.getElementById("input-width");
+        const heightInput = document.getElementById("input-height");
+        const renderBtn = document.getElementById("render-btn");
+        const statusText = document.getElementById("status-text");
+
+        const jsonIoTextarea = document.getElementById("json-io");
+        const applyJsonBtn = document.getElementById("apply-json-btn");
+        const copyJsonBtn = document.getElementById("copy-json-btn");
+        const uploadJsonBtn = document.getElementById("upload-json-btn");
+        const downloadJsonBtn = document.getElementById("download-json-btn");
+        const fileInput = document.getElementById("file-input");
+
+        function updateColorListUI() {
+            colorListEl.innerHTML = "";
+            
+            jsonIoTextarea.value = JSON.stringify(currentColors, null, 2);
+
+            currentColors.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement("div");
+                rowDiv.className = "color-row";
+
+                const rowHeader = document.createElement("div");
+                rowHeader.className = "row-header";
+                rowHeader.innerHTML = `<span>ROW ${rowIndex + 1}</span>`;
+                rowDiv.appendChild(rowHeader);
+
+                row.forEach((hex, colIndex) => {
+                    const item = document.createElement("div");
+                    item.className = "color-item";
+
+                    const picker = document.createElement("input");
+                    picker.type = "color";
+                    picker.value = hex;
+                    picker.addEventListener("input", (e) => {
+                        currentColors[rowIndex][colIndex] = e.target.value;
+                        label.innerText = e.target.value.toUpperCase();
+                        jsonIoTextarea.value = JSON.stringify(currentColors, null, 2);
+                        presetSelect.value = "custom";
+                    });
+
+                    const label = document.createElement("span");
+                    label.innerText = hex.toUpperCase();
+
+                    const removeColorBtn = document.createElement("button");
+                    removeColorBtn.className = "danger";
+                    removeColorBtn.innerText = "✕";
+                    removeColorBtn.title = "Remove Color";
+                    removeColorBtn.onclick = () => {
+                        currentColors[rowIndex].splice(colIndex, 1);
+                        if (currentColors[rowIndex].length === 0) {
+                            currentColors.splice(rowIndex, 1);
+                        }
+                        if (currentColors.length === 0) {
+                            currentColors.push(["#FFFFFF"]);
+                        }
+                        presetSelect.value = "custom";
+                        updateColorListUI();
+                    };
+
+                    item.appendChild(picker);
+                    item.appendChild(label);
+                    item.appendChild(removeColorBtn);
+                    rowDiv.appendChild(item);
+                });
+
+                const rowControls = document.createElement("div");
+                rowControls.className = "row-controls";
+
+                const addColorBtn = document.createElement("button");
+                addColorBtn.className = "secondary";
+                addColorBtn.innerText = "+ Add Color";
+                addColorBtn.onclick = () => {
+                    currentColors[rowIndex].push("#FFFFFF");
+                    presetSelect.value = "custom";
+                    updateColorListUI();
+                };
+
+                const addRowBtn = document.createElement("button");
+                addRowBtn.className = "secondary";
+                addRowBtn.innerText = "+ Add Row Below";
+                addRowBtn.onclick = () => {
+                    currentColors.splice(rowIndex + 1, 0, ["#FFFFFF"]);
+                    presetSelect.value = "custom";
+                    updateColorListUI();
+                };
+
+                rowControls.appendChild(addColorBtn);
+                rowControls.appendChild(addRowBtn);
+                rowDiv.appendChild(rowControls);
+
+                colorListEl.appendChild(rowDiv);
+            });
+        }
+
+        function validateAndLoadJSON(data) {
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error("JSON must be a non-empty array of rows.");
+            }
+            for (let i = 0; i < data.length; i++) {
+                if (!Array.isArray(data[i]) || data[i].length === 0) {
+                    throw new Error(`Row ${i + 1} must be a non-empty array of color strings.`);
+                }
+                for (let j = 0; j < data[i].length; j++) {
+                    if (typeof data[i][j] !== "string" || !data[i][j].startsWith("#")) {
+                        throw new Error(`Invalid color "${data[i][j]}" in Row ${i + 1}. Must be a hex string like "#FF0000".`);
+                    }
+                }
+            }
+            currentColors = data;
+            presetSelect.value = "custom";
+            updateColorListUI();
+            renderFlag();
+        }
+
+        applyJsonBtn.addEventListener("click", () => {
+            try {
+                const parsed = JSON.parse(jsonIoTextarea.value);
+                validateAndLoadJSON(parsed);
+                statusText.innerText = "Layout imported successfully!";
+                statusText.style.color = "#8bc34a";
+            } catch (err) {
+                alert("Import Error: " + err.message);
+            }
+        });
+
+        copyJsonBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(jsonIoTextarea.value);
+            const originalText = copyJsonBtn.innerText;
+            copyJsonBtn.innerText = "Copied!";
+            setTimeout(() => copyJsonBtn.innerText = originalText, 1500);
+        });
+
+        downloadJsonBtn.addEventListener("click", () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentColors, null, 2));
+            const anchor = document.createElement("a");
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", "wallpaper-layout.json");
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        });
+
+        uploadJsonBtn.addEventListener("click", () => fileInput.click());
+
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    validateAndLoadJSON(parsed);
+                    statusText.innerText = `Loaded "${file.name}"`;
+                    statusText.style.color = "#8bc34a";
+                } catch (err) {
+                    alert("File Read Error: " + err.message);
+                }
+                fileInput.value = ""; // Reset input
+            };
+            reader.readAsText(file);
+        });
+
+        presetSelect.addEventListener("change", (e) => {
+            if (PRESETS[e.target.value]) {
+                currentColors = JSON.parse(JSON.stringify(PRESETS[e.target.value]));
+                updateColorListUI();
+                renderFlag();
+            }
+        });
+
+        renderBtn.addEventListener("click", renderFlag);
+
+        function hexToRgb(hex) {
+            const bigint = parseInt(hex.replace("#", ""), 16);
+            return {
+                r: (bigint >> 16) & 255,
+                g: (bigint >> 8) & 255,
+                b: bigint & 255
+            };
+        }
+
+        function ColorNode(x, y, r, g, b) {
+            this.x = x;
+            this.y = y;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        // Blending function based on first closest, second closest, and furthest colors
+        function blend(colors, vals, channel) {
+            const c1 = colors[vals[0].idx][channel];
+            const c2 = colors[vals[1].idx][channel];
+            const c3 = colors[vals[Math.min(3, vals.length - 1)].idx][channel];
+            return (c1 * 2 + c2 * 1 + c3 * 1) / 4;
+        }
+
+        function renderFlag() {
+            const width = parseInt(widthInput.value, 10);
+            const height = parseInt(heightInput.value, 10);
+
+            if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+                return alert("Please enter valid width and height resolutions.");
+            }
+
+            statusText.innerText = "Rendering...";
+            statusText.style.color = "#FF9800";
+
+            setTimeout(() => {
+                canvas.width = width;
+                canvas.height = height;
+                const imageData = ctx.createImageData(width, height);
+                const data = imageData.data;
+
+                // Map color sequence to grid coordinates
+                const colorNodes = [];
+                const numRows = currentColors.length;
+                const yDiff = height / numRows; // Space allotted per row
+
+                currentColors.forEach((rowColors, r) => {
+                    const numCols = rowColors.length;
+                    const xDiff = width / numCols; // Space allotted per color in this specific row
+                    
+                    rowColors.forEach((hex, c) => {
+                        const x = (c * xDiff) + (xDiff / 2);
+                        const y = (r * yDiff) + (yDiff / 2);
+                        const rgb = hexToRgb(hex);
+                        colorNodes.push(new ColorNode(x, y, rgb.r, rgb.g, rgb.b));
+                    });
+                });
+
+                // Pre-allocate array for sorting distance calculations
+                const vals = new Array(colorNodes.length);
+                for (let j = 0; j < colorNodes.length; j++) {
+                    vals[j] = { d2: 0, idx: j };
+                }
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const pixelIndex = (y * width + x) * 4;
+
+                        for (let j = 0; j < colorNodes.length; j++) {
+                            const dx = x - colorNodes[j].x;
+                            const dy = y - colorNodes[j].y;
+                            vals[j].d2 = dx * dx + dy * dy;
+                            vals[j].idx = j;
+                        }
+
+                        vals.sort((a, b) => a.d2 - b.d2);
+
+                        data[pixelIndex]     = blend(colorNodes, vals, "r");
+                        data[pixelIndex + 1] = blend(colorNodes, vals, "g");
+                        data[pixelIndex + 2] = blend(colorNodes, vals, "b");
+                        data[pixelIndex + 3] = 255; 
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                statusText.innerText = `Done (${width}x${height})`;
+                statusText.style.color = "#8bc34a";
+            }, 20);
+        }
+
+        updateColorListUI();
+        renderFlag();
+    </script>
+</body>
+</html>

@@ -72,10 +72,11 @@ a:focus {
 }
 
 .site-nav {
-  margin-top: 1.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  max-width: var(--page-max-width);
+  margin: 1.5rem auto;
 }
 
 .site-nav a {
