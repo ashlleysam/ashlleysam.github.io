@@ -1,0 +1,1 @@
+{"version":3,"file":"write-source.d.ts","sourceRoot":"","sources":["../src/write-source.ts"],"names":[],"mappings":"AAAA,mFAAmF;AACnF,MAAM,WAAW,WAAW;IAC1B,iEAAiE;IACjE,EAAE,EAAE,MAAM,CAAC;IACX,+DAA+D;IAC/D,kBAAkB,EAAE,MAAM,CAAC;IAC3B,KAAK,EAAE,OAAO,CAAC;CAChB;AAED,sFAAsF;AACtF,wBAAgB,aAAa,CAAC,EAAE,EAAE,MAAM,EAAE,IAAI,EAAE,MAAM,GAAG,WAAW,CAInE"}

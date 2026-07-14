@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ashley Samuelson | PortalAdvance</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="module" src="../common.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-brand">
+      <h1>Ashley Samuelson</h1>
+      <p>Computer Science Ph.D. Candidate | UW-Madison</p>
+    </div>
+    <nav class="site-nav">
+      <a href="../index.html#home">Home</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#research">Research</a>
+      <a href="../index.html#teaching">Teaching</a>
+      <a href="../index.html#talks">Talks</a>
+      <a href="index.html">Fun</a>
+    </nav>
+  </header>
+  <main>
+    <article class="section">
+      <h1 class="page-title">PortalAdvance Emulator</h1>
+      <p>
+        Play the PortalAdvance ROM in a browser using the <a href="https://github.com/macabeus/gba-kit">gba-kit</a> Game Boy Advance emulator.
+      </p>
+    </article>
+    <article class="section emulator-panel">
+      <div class="button-row">
+        <button id="run-button">Run</button>
+        <button id="pause-button" class="secondary">Pause</button>
+        <!-- <button id="audio-button" class="secondary">Enable Audio</button> -->
+      </div>
+      <div>
+        <p><strong>Status:</strong> <span id="emulator-status">Initializing...</span></p>
+      </div>
+      <canvas id="gba-canvas" aria-label="GBA emulator display"></canvas>
+      <div class="key-instructions">
+        <p><strong>Controls:</strong></p>
+        <ul>
+          <li><strong>Arrow keys</strong> — D-pad</li>
+          <li><strong>Z</strong> — A button</li>
+          <li><strong>X</strong> — B button</li>
+          <li><strong>Enter</strong> — Start</li>
+          <li><strong>Backspace</strong> — Select</li>
+          <li><strong>A</strong> — R shoulder</li>
+          <li><strong>S</strong> — L shoulder</li>
+        </ul>
+      </div>
+    </article>
+    <article class="section">
+      <p>
+        If the emulator does not start automatically, press <strong>Run</strong>.
+        <!-- Use the audio button to allow sound output after a user gesture. -->
+      </p>
+    </article>
+    <article class="section">
+      <p>
+        The source is available at <a href="https://github.com/ashlleysam/PortalAdvance" target="_blank" rel="noopener noreferrer">github.com/ashlleysam/PortalAdvance</a>.
+      </p>
+    </article>
+  </main>
+  <script type="module">
+    import { EmulatorBridge } from './vendor/@gba-kit/gba-browser/dist/index.js';
+
+    const status = document.getElementById('emulator-status');
+    const canvas = document.getElementById('gba-canvas');
+    const runButton = document.getElementById('run-button');
+    const pauseButton = document.getElementById('pause-button');
+    // const audioButton = document.getElementById('audio-button');
+
+    const emulator = new EmulatorBridge();
+    emulator.attachCanvas(canvas);
+
+    function updateStatus(message) {
+      status.textContent = message;
+    }
+
+    async function loadRom() {
+      try {
+        updateStatus('Loading ROM...');
+        const romUrl = new URL('../PortalAdvance.gba', window.location.href).href;
+        const response = await fetch(romUrl);
+        if (!response.ok) {
+          throw new Error(`Unable to fetch ROM: ${response.status}`);
+        }
+        const romBuffer = await response.arrayBuffer();
+        emulator.loadRom(romBuffer);
+        emulator.runOneFrame();
+        updateStatus('ROM loaded. Ready to run. Press Run to begin.');
+      } catch (error) {
+        updateStatus('Error loading ROM: ' + error.message);
+      }
+    }
+
+    runButton.addEventListener('click', () => {
+      emulator.run();
+      updateStatus('Running. Use the keyboard controls to play.');
+    });
+
+    pauseButton.addEventListener('click', () => {
+      emulator.pause();
+      updateStatus('Paused. Press Run to resume.');
+    });
+
+    // audioButton.addEventListener('click', () => {
+    //   const enabled = emulator.toggleAudio();
+    //   audioButton.textContent = enabled ? 'Mute Audio' : 'Enable Audio';
+    // });
+
+    window.addEventListener('keydown', (event) => emulator.handleKeyDown(event));
+    window.addEventListener('keyup', (event) => emulator.handleKeyUp(event));
+
+    loadRom();
+  </script>
+</body>
+</html>
