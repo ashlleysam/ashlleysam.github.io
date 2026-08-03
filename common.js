@@ -29,7 +29,7 @@ function applyTheme(config, theme = 'light') {
     root.style.setProperty('--font-family', config.font || 'Inter, system-ui, sans-serif');
   }
 
-  root.classList.toggle('dark-mode', theme === 'dark');
+  // root.classList.toggle('dark-mode', theme === 'dark');
 
   if (theme === 'light') {
     root.style.removeProperty('--background-color');
@@ -72,7 +72,7 @@ function applyTheme(config, theme = 'light') {
 
 function setTheme(theme) {
   const root = document.documentElement;
-  root.classList.toggle('dark-mode', theme === 'dark');
+  // root.classList.toggle('dark-mode', theme === 'dark');
   localStorage.setItem('site-theme', theme);
   if (activeThemeConfig) {
     applyTheme(activeThemeConfig, theme);
@@ -82,7 +82,7 @@ function setTheme(theme) {
 function initializeThemeState() {
   const storedTheme = localStorage.getItem('site-theme');
   const preferredTheme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  document.documentElement.classList.toggle('dark-mode', preferredTheme === 'dark');
+  // document.documentElement.classList.toggle('dark-mode', preferredTheme === 'dark');
   document.documentElement.classList.add('theme-ready');
   document.body.classList.add('theme-ready');
   return preferredTheme;
@@ -172,9 +172,9 @@ function activateNavigation() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const config = await loadThemeConfig();
-  const preferredTheme = initializeThemeState();
-  applyTheme(config, preferredTheme);
-  initializeThemeToggle();
+  // const config = await loadThemeConfig();
+  // const preferredTheme = initializeThemeState();
+  // applyTheme(config, preferredTheme);
+  // initializeThemeToggle();
   activateNavigation();
 });

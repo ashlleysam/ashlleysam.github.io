@@ -26,7 +26,7 @@
   --shadow: 0 24px 55px rgba(3, 12, 24, 0.36);
 }
 
-html.dark-mode {
+/* html.dark-mode {
   color-scheme: dark;
   --color-main: #14324f;
   --color-main-strong: #0d1f33;
@@ -39,7 +39,7 @@ html.dark-mode {
   --color-muted: #9eb0c5;
   --color-border: rgba(255, 255, 255, 0.12);
   --nav-text-color: #f4f7fb;
-}
+} */
 
 * {
   box-sizing: border-box;
