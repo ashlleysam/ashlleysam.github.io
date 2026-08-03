@@ -1,8 +1,33 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   font-family: var(--font-family, "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif);
   --font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --page-max-width: 1080px;
+  --color-main: #2c5282;
+  --color-main-strong: #1e3a6e;
+  --color-secondary: #2563eb;
+  --color-accent: #0ea5e9;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-strong: #e2e8f0;
+  --color-text: #0f172a;
+  --color-muted: #475569;
+  --color-border: rgba(15, 23, 42, 0.12);
+  --primary-color: var(--color-main);
+  --secondary-color: var(--color-secondary);
+  --accent-color: var(--color-accent);
+  --background-color: var(--color-background);
+  --surface-color: var(--color-surface);
+  --text-color: var(--color-text);
+  --muted-color: var(--color-muted);
+  --border-color: var(--color-border);
+  --nav-text-color: #ffffff;
+  --radius: 20px;
+  --shadow: 0 24px 55px rgba(3, 12, 24, 0.36);
+}
+
+html.dark-mode {
+  color-scheme: dark;
   --color-main: #14324f;
   --color-main-strong: #0d1f33;
   --color-secondary: #7da2c4;
@@ -13,17 +38,7 @@
   --color-text: #f4f7fb;
   --color-muted: #9eb0c5;
   --color-border: rgba(255, 255, 255, 0.12);
-  --primary-color: var(--color-main);
-  --secondary-color: var(--color-secondary);
-  --accent-color: var(--color-accent);
-  --background-color: var(--color-background);
-  --surface-color: var(--color-surface);
-  --text-color: var(--color-text);
-  --muted-color: var(--color-muted);
-  --border-color: var(--color-border);
-  --nav-text-color: var(--color-text);
-  --radius: 20px;
-  --shadow: 0 24px 55px rgba(3, 12, 24, 0.36);
+  --nav-text-color: #f4f7fb;
 }
 
 * {
@@ -32,6 +47,25 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+html.theme-ready,
+body.theme-ready,
+.site-header.theme-ready,
+.site-nav.theme-ready,
+.site-nav li.theme-ready,
+.theme-toggle.theme-ready,
+.section.theme-ready,
+.card.theme-ready,
+.button-row button.theme-ready,
+.button-link.theme-ready,
+.contact-link.theme-ready,
+.site-footer.theme-ready {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body {
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 html,
@@ -108,6 +142,10 @@ a:focus {
   width: min(100%, var(--page-max-width));
   margin: 0 auto;
   padding: 0.95rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .site-nav ul {
@@ -118,6 +156,7 @@ a:focus {
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1;
 }
 
 .site-nav li {
@@ -139,6 +178,90 @@ a:focus {
   background: rgba(255, 255, 255, 0.16);
 }
 
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  width: 3rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--nav-text-color);
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.theme-toggle .theme-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+.theme-toggle .theme-icon.sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.theme-toggle .theme-icon.moon {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.75);
+}
+
+html.dark-mode .theme-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: var(--nav-text-color);
+}
+
+html.dark-mode .theme-toggle:hover,
+html.dark-mode .theme-toggle:focus {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+html.dark-mode .theme-icon.sun {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.75);
+}
+
+html.dark-mode .theme-icon.moon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+html:not(.dark-mode) .theme-icon.sun {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+html:not(.dark-mode) .theme-icon.moon {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.75);
+}
+
+html:not(.dark-mode) .site-header,
+html:not(.dark-mode) .site-nav,
+html:not(.dark-mode) .site-brand,
+html:not(.dark-mode) .site-brand h1,
+html:not(.dark-mode) .site-brand p,
+html:not(.dark-mode) .site-nav li a {
+  color: #ffffff;
+}
+
 main [id] {
   scroll-margin-top: 130px;
 }
@@ -152,7 +275,7 @@ main [id] {
   align-items: center;
   justify-content: center;
   padding: 0.7rem 1rem;
-  color: var(--nav-text-color);
+  color: #ffffff;
   font-weight: 600;
   text-decoration: none;
 }
