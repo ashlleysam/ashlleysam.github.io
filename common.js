@@ -26,38 +26,87 @@ function applyTheme(config) {
   }
   const root = document.documentElement;
   root.style.setProperty('--font-family', config.font || 'Inter, system-ui, sans-serif');
-  root.style.setProperty('--background-color', config.background || '#f5f7fb');
-  root.style.setProperty('--surface-color', config.surface || '#ffffff');
-  root.style.setProperty('--text-color', config.text || '#1d2939');
-  root.style.setProperty('--primary-color', config.primary || '#1f4e79');
-  root.style.setProperty('--accent-color', config.accent || '#dd6b20');
-  root.style.setProperty('--muted-color', config.muted || '#4b5563');
-  root.style.setProperty('--border-color', config.border || '#d1d5db');
-  root.style.setProperty('--nav-text-color', config.navText || '#ffffff');
+  root.style.setProperty('--background-color', config.background || '#07111c');
+  root.style.setProperty('--surface-color', config.surface || '#12263d');
+  root.style.setProperty('--text-color', config.text || '#f4f7fb');
+  root.style.setProperty('--primary-color', config.primary || '#14324f');
+  root.style.setProperty('--secondary-color', config.secondary || '#7da2c4');
+  root.style.setProperty('--accent-color', config.accent || '#87d7f2');
+  root.style.setProperty('--muted-color', config.muted || '#9eb0c5');
+  root.style.setProperty('--border-color', config.border || 'rgba(255, 255, 255, 0.12)');
+  root.style.setProperty('--nav-text-color', config.navText || '#f4f7fb');
+  root.style.setProperty('--color-main', config.primary || '#14324f');
+  root.style.setProperty('--color-secondary', config.secondary || '#7da2c4');
+  root.style.setProperty('--color-accent', config.accent || '#87d7f2');
+  root.style.setProperty('--color-background', config.background || '#07111c');
+  root.style.setProperty('--color-surface', config.surface || '#12263d');
+  root.style.setProperty('--color-text', config.text || '#f4f7fb');
+  root.style.setProperty('--color-muted', config.muted || '#9eb0c5');
+  root.style.setProperty('--color-border', config.border || 'rgba(255, 255, 255, 0.12)');
 }
 
 function activateNavigation() {
   const links = Array.from(document.querySelectorAll('nav.site-nav a'));
-  const currentUrl = new URL(window.location.href);
-  const currentPath = currentUrl.pathname.replace(/\/index\.html$/, '/');
-  const currentHash = currentUrl.hash || '#home';
+  const sections = Array.from(document.querySelectorAll('main [id]'))
+    .filter((section) => section.id);
 
-  for (const link of links) {
-    try {
-      const href = link.getAttribute('href');
-      const linkUrl = new URL(href, window.location.href);
-      const linkPath = linkUrl.pathname.replace(/\/index\.html$/, '/');
-      const linkHash = linkUrl.hash || '#home';
-
-      const isSamePage = linkPath === currentPath;
-      const isActive = isSamePage && (linkHash === currentHash || (linkHash === '#home' && currentHash === ''));
-      if (isActive) {
-        link.classList.add('active');
-      }
-    } catch (_) {
-      continue;
+  const getSectionTarget = (link) => {
+    const href = link.getAttribute('href') || '';
+    if (!href.includes('#')) {
+      return null;
     }
-  }
+    return href.split('#')[1] || null;
+  };
+
+  const getLinkPage = (link) => {
+    try {
+      return new URL(link.href, document.baseURI);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const updateActiveLink = () => {
+    const currentUrl = new URL(window.location.href);
+    const offset = Math.max(120, document.querySelector('nav.site-nav')?.offsetHeight || 120);
+    const scrollPosition = window.scrollY || window.pageYOffset;
+
+    let currentSection = 'home';
+    sections.forEach((section) => {
+      const sectionTop = section.offsetTop;
+      if (scrollPosition >= sectionTop - offset - 8) {
+        currentSection = section.id;
+      }
+    });
+
+    links.forEach((link) => {
+      const parentItem = link.closest('li');
+      if (parentItem) {
+        parentItem.classList.remove('active');
+      }
+      link.classList.remove('active');
+
+      const linkUrl = getLinkPage(link);
+      const linkHash = getSectionTarget(link);
+      const samePage = linkUrl && linkUrl.pathname === currentUrl.pathname;
+      const isCurrentAnchor = samePage && linkHash === currentSection;
+      const isCurrentHome = samePage && (linkHash === 'home' || linkHash === '' || linkUrl.hash === '');
+      const isPageLink = linkUrl && !linkUrl.hash && linkUrl.pathname === currentUrl.pathname;
+
+      if (isCurrentAnchor || (currentSection === 'home' && isCurrentHome) || (!linkHash && isPageLink)) {
+        link.classList.add('active');
+        if (parentItem) {
+          parentItem.classList.add('active');
+        }
+      }
+    });
+  };
+
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  window.addEventListener('resize', updateActiveLink);
+  window.addEventListener('hashchange', updateActiveLink);
+  links.forEach((link) => link.addEventListener('click', () => setTimeout(updateActiveLink, 0)));
+  updateActiveLink();
 }
 
 window.addEventListener('DOMContentLoaded', async () => {

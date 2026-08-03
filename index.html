@@ -13,22 +13,35 @@
       <h1>Ashley Samuelson</h1>
       <p>Computer Science Ph.D. Candidate | UW-Madison</p>
     </div>
-    <nav class="site-nav">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#research">Research</a>
-      <a href="#teaching">Teaching</a>
-      <a href="#talks">Talks</a>
-      <a href="fun/index.html">Fun</a>
-    </nav>
   </header>
-  <main>
-    <article class="section" id="home">
-      <!-- <div class="button-row">
-        <a class="button-link" href="cv.pdf" download>Download CV</a>
-      </div> -->
-    </article>
+  <nav class="site-nav" aria-label="Site navigation">
+    <div class="site-nav-container">
+      <ul>
+        <li class="nav-item section-link"><a href="#home">Home</a></li>
+        <li class="nav-item section-link"><a href="#about">About</a></li>
+        <li class="nav-item section-link"><a href="#research">Research</a></li>
+        <li class="nav-item section-link"><a href="#teaching">Teaching</a></li>
+        <li class="nav-item section-link"><a href="#talks">Talks</a></li>
+        <li class="nav-item page-link"><a href="fun/index.html">Fun</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main id="home">
     <article class="section" id="about">
+      <div class="contact-links" aria-label="Contact links">
+        <a class="contact-link" href="mailto:ashley.samuelson@wisc.edu">
+          <span class="contact-icon email" aria-hidden="true"></span>
+          <span>Email</span>
+        </a>
+        <a class="contact-link" href="https://github.com/ashlleysam" target="_blank" rel="noopener noreferrer">
+          <span class="contact-icon github" aria-hidden="true"></span>
+          <span>GitHub</span>
+        </a>
+        <a class="contact-link" href="https://orcid.org/0009-0001-8800-2590" target="_blank" rel="noopener noreferrer">
+          <span class="contact-icon orcid" aria-hidden="true"></span>
+          <span>ORCID</span>
+        </a>
+      </div>
       <h2>About</h2>
       <p>
         I am a Ph.D. candidate in Computer Science at UW-Madison, where I'm advised by <a href="https://cecchetti.sites.cs.wisc.edu/">Ethan Cecchetti</a>.
@@ -128,14 +141,13 @@
         </li>
       </ul>
     </article>
-    <article class="section" id="contact">
-      <h2>Contact</h2>
-      <p>
-        <strong>Email:</strong> <a href="mailto:ashley.samuelson@wisc.edu">ashley.samuelson@wisc.edu</a><br />
-        <strong>GitHub:</strong> <a href="https://github.com/ashlleysam" target="_blank" rel="noopener noreferrer">github.com/ashlleysam</a>
-      </p>
-    </article>
   </main>
+  <footer>
+    <div class="site-footer">
+      <span class="credit-icon" aria-hidden="true"></span>
+      <span>Theme adapted from the <a href="https://github.com/HugoBlox/hugo-theme-academic-cv/tree/main">Hugo Academic CV theme</a>.</span>
+    </div>
+  </footer>
 </body>
 </html>
 

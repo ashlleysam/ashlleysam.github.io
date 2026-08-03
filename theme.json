@@ -1,13 +1,14 @@
 {
   "brandName": "Ashley Samuelson",
   "brandTagline": "Teaching-focused Academic Computer Science Candidate",
-  "primary": "#1f4e79",
-  "accent": "#dd6b20",
-  "background": "#f5f7fb",
-  "surface": "#ffffff",
-  "text": "#1d2939",
-  "muted": "#4b5563",
-  "navText": "#ffffff",
-  "border": "#d1d5db",
+  "primary": "#14324f",
+  "secondary": "#7da2c4",
+  "accent": "#87d7f2",
+  "background": "#07111c",
+  "surface": "#12263d",
+  "text": "#f4f7fb",
+  "muted": "#9eb0c5",
+  "navText": "#f4f7fb",
+  "border": "rgba(255, 255, 255, 0.12)",
   "font": "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
 }

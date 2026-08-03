@@ -13,16 +13,20 @@
       <h1>Ashley Samuelson</h1>
       <p>Computer Science Ph.D. Candidate | UW-Madison</p>
     </div>
-    <nav class="site-nav">
-      <a href="../index.html#home">Home</a>
-      <a href="../index.html#about">About</a>
-      <a href="../index.html#research">Research</a>
-      <a href="../index.html#teaching">Teaching</a>
-      <a href="../index.html#talks">Talks</a>
-      <a href="index.html">Fun</a>
-    </nav>
   </header>
-  <main>
+  <nav class="site-nav" aria-label="Site navigation">
+    <div class="site-nav-container">
+      <ul>
+        <li class="nav-item section-link"><a href="../index.html#home">Home</a></li>
+        <li class="nav-item section-link"><a href="../index.html#about">About</a></li>
+        <li class="nav-item section-link"><a href="../index.html#research">Research</a></li>
+        <li class="nav-item section-link"><a href="../index.html#teaching">Teaching</a></li>
+        <li class="nav-item section-link"><a href="../index.html#talks">Talks</a></li>
+        <li class="nav-item page-link"><a href="index.html">Fun</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main id="home">
     <article class="section">
       <h1 class="page-title">Fun</h1>
       <p>
@@ -55,5 +59,11 @@
       </article>
     </section>
   </main>
+  <footer>
+    <div class="site-footer">
+      <span class="credit-icon" aria-hidden="true"></span>
+      <span>Theme adapted from the <a href="https://github.com/HugoBlox/hugo-theme-academic-cv/tree/main">Hugo Academic CV theme</a>.</span>
+    </div>
+  </footer>
 </body>
 </html>

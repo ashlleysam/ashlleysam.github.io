@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Hugo Academic CV theme icon">
+  <rect x="6" y="6" width="52" height="52" rx="12" fill="none" stroke="currentColor" stroke-width="4"/>
+  <path d="M20 20h24v8H20z" fill="currentColor"/>
+  <path d="M20 36h12v8H20z" fill="currentColor"/>
+  <path d="M36 36h8v8h-8z" fill="currentColor"/>
+</svg>
