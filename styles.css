@@ -32,7 +32,14 @@
 
 html {
   scroll-behavior: smooth;
+
+  background-image: 
+    linear-gradient(to bottom, transparent 50%, var(--background-color) 50%),
+    linear-gradient(135deg, var(--color-main-strong) 0%, var(--primary-color) 100%);
+  background-attachment: fixed;
+  background-color: var(--background-color);
 }
+
 
 html.theme-ready,
 body.theme-ready,
@@ -57,15 +64,15 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: radial-gradient(circle at top left, rgba(135, 215, 242, 0.16), transparent 36%), var(--background-color);
-  color: var(--text-color);
-  font-family: var(--font-family);
-  line-height: 1.65;
 }
 
 body {
   display: flex;
   flex-direction: column;
+  background: radial-gradient(circle at top left, rgba(135, 215, 242, 0.16), transparent 36%), var(--background-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  line-height: 1.65;
 }
 
 img {
@@ -90,7 +97,7 @@ a:focus {
   z-index: 1;
   width: 100%;
   padding: 2.25rem 1rem 1rem;
-  background: linear-gradient(135deg, var(--color-main-strong) 0%, var(--primary-color) 100%);
+  background: linear-gradient(135deg, var(--color-main-strong) 0%, var(--primary-color) 100%) fixed;
   color: var(--nav-text-color);
 }
 
@@ -123,8 +130,7 @@ a:focus {
   top: 0;
   z-index: 70;
   width: 100%;
-  background: linear-gradient(135deg, var(--color-main-strong, var(--color-main)) 0%, var(--primary-color) 100%);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  background: linear-gradient(135deg, var(--color-main-strong, var(--color-main)) 0%, var(--primary-color) 100%) fixed;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -575,14 +581,16 @@ iframe {
   }
 
   .theme-toggle {
-    margin: 0 auto; 
+    margin: 0 auto;
     order: 2;
-    padding: 0; 
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 3rem; 
+    border-radius: 999px;
   }
-
+  
   .button-row {
     flex-direction: column;
   }
