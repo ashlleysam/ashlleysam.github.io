@@ -1,0 +1,12 @@
+{
+  "primary": "#006874",
+  "secondary": "#D0600F",
+  "accent": "#B72051",
+  "background": "#FDFBFF",
+  "surface": "#F4F6F9",
+  "text": "#1A1C1E",
+  "muted": "#73777F",
+  "navText": "#FFFFFF",
+  "border": "rgba(26, 28, 30, 0.12)",
+  "font": "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+}

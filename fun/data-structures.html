@@ -4,10 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ashley Samuelson | Data Structure Playground</title>
-  <script>
+<script>
     try {
-      if (localStorage.getItem('site-theme') === 'dark') {
+      const storedTheme = localStorage.getItem('site-theme');
+      const cachedConfig = localStorage.getItem('site-theme-config');
+      
+      if (storedTheme === 'dark') {
         document.documentElement.classList.add('dark-mode');
+      } else if (storedTheme === 'light') {
+        document.documentElement.classList.add('light-mode');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+
+      if (cachedConfig) {
+        const config = JSON.parse(cachedConfig);
+        const root = document.documentElement;
+        root.style.setProperty('--primary-color', config.primary);
+        root.style.setProperty('--secondary-color', config.secondary);
+        root.style.setProperty('--accent-color', config.accent);
+        root.style.setProperty('--background-color', config.background);
+        root.style.setProperty('--surface-color', config.surface);
+        root.style.setProperty('--text-color', config.text);
+        root.style.setProperty('--muted-color', config.muted);
+        root.style.setProperty('--border-color', config.border);
+        root.style.setProperty('--nav-text-color', config.navText);
+        root.style.setProperty('--color-main', config.primary);
+        root.style.setProperty('--color-secondary', config.secondary);
+        root.style.setProperty('--color-accent', config.accent);
+        root.style.setProperty('--color-background', config.background);
+        root.style.setProperty('--color-surface', config.surface);
+        root.style.setProperty('--color-text', config.text);
+        root.style.setProperty('--color-muted', config.muted);
+        root.style.setProperty('--color-border', config.border);
+        if (config.font) root.style.setProperty('--font-family', config.font);
       }
     } catch (e) {}
   </script>
@@ -31,15 +61,15 @@
         <li class="nav-item section-link"><a href="../index.html#talks">Talks</a></li>
         <li class="nav-item page-link"><a href="index.html">Fun</a></li>
       </ul>
-      <!-- <button class="theme-toggle" type="button" aria-label="Toggle theme">
+      <button class="theme-toggle" type="button" aria-label="Toggle theme">
         <svg class="theme-icon sun" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
           <circle cx="12" cy="12" r="5" />
           <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <svg class="theme-icon moon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-          <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" />
+        <svg class="theme-icon moon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" >
+          <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-      </button> -->
+      </button>
     </div>
   </nav>
   <main>

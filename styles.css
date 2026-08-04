@@ -26,21 +26,6 @@
   --shadow: 0 24px 55px rgba(3, 12, 24, 0.36);
 }
 
-/* html.dark-mode {
-  color-scheme: dark;
-  --color-main: #14324f;
-  --color-main-strong: #0d1f33;
-  --color-secondary: #7da2c4;
-  --color-accent: #87d7f2;
-  --color-background: #07111c;
-  --color-surface: #12263d;
-  --color-surface-strong: #18324a;
-  --color-text: #f4f7fb;
-  --color-muted: #9eb0c5;
-  --color-border: rgba(255, 255, 255, 0.12);
-  --nav-text-color: #f4f7fb;
-} */
-
 * {
   box-sizing: border-box;
 }
@@ -115,6 +100,11 @@ a:focus {
   text-align: left;
 }
 
+.site-brand, 
+.site-brand a {
+    color: #ffffff !important;
+}
+
 .site-brand h1 {
   margin: 0;
   font-size: clamp(2rem, 3vw, 2.95rem);
@@ -146,6 +136,7 @@ a:focus {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .site-nav ul {
@@ -156,7 +147,7 @@ a:focus {
   list-style: none;
   margin: 0;
   padding: 0;
-  flex: 1;
+  flex: 1 1 auto;
 }
 
 .site-nav li {
@@ -188,10 +179,11 @@ a:focus {
   height: 2.5rem;
   padding: 0;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--nav-text-color);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
   cursor: pointer;
+  margin-left: auto;
 }
 
 .theme-toggle:hover,
@@ -223,8 +215,8 @@ a:focus {
 }
 
 html.dark-mode .theme-toggle {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
   color: var(--nav-text-color);
 }
 
@@ -568,6 +560,11 @@ iframe {
 }
 
 @media (max-width: 680px) {
+  .site-nav-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .site-nav ul {
     flex-direction: column;
     align-items: stretch;
@@ -575,6 +572,15 @@ iframe {
 
   .site-nav li {
     width: 100%;
+  }
+
+  .theme-toggle {
+    margin: 0 auto; 
+    order: 2;
+    padding: 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .button-row {
