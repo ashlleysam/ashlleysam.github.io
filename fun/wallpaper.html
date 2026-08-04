@@ -202,7 +202,13 @@
             font-size: 0.9rem;
         }
 
-        button:hover { background: #1976D2; }
+        button:hover:not(:disabled) { background: #1976D2; }
+        
+        button:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
         
         button.secondary {
             background: #444;
@@ -210,14 +216,14 @@
             flex: 1;
             font-size: 0.8rem;
         }
-        button.secondary:hover { background: #555; }
+        button.secondary:hover:not(:disabled) { background: #555; }
 
         button.danger {
             background: #d32f2f;
             padding: 4px 8px;
             font-size: 0.8rem;
         }
-        button.danger:hover { background: #b71c1c; }
+        button.danger:hover:not(:disabled) { background: #b71c1c; }
 
         .status {
             font-size: 0.85rem;
@@ -230,7 +236,7 @@
 <body>
 
     <div class="sidebar">
-        <h2>Flag Generator</h2>
+        <h2>Wallpaper Generator</h2>
         
         <details class="help-section">
             <summary>Help & Info</summary>
@@ -242,9 +248,9 @@
                     For more information on the math, look up <a href="https://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagrams</a>.
                 </p>
                 <p><strong>Auto-Rendering: </strong>Selecting any from the dropdown automatically renders the image wallpaper.</p>
-                <p><strong>Render Flag Button: </strong>
+                <p><strong>Render Wallpaper Button: </strong>
                     Because the rendering is pixel-by-pixel, it can become slower at high resolutions, so custom edits (adding colors, rows, or resizing) do not render automatically.
-                    When you are done adjusting your custom layout, click <strong>Render Flag</strong> to generate your new wallpaper without freezing your browser during editing.
+                    When you are done adjusting your custom layout, click <strong>Render Wallpaper</strong> to generate your new wallpaper without freezing your browser during editing.
                 </p>
             </div>
         </details>
@@ -255,7 +261,7 @@
                 <option value="material">Multicolor</option>
                 <option value="gay">Rainbow</option>
                 <option value="trans">Pink and Blue</option>
-                <option value="usa">USA Flag</option>
+                <option value="usa">Red, White, and Blue</option>
                 <option value="custom">Custom</option>
             </select>
         </div>
@@ -263,11 +269,11 @@
         <div class="row">
             <div>
                 <label for="input-width">Width (px)</label>
-                <input type="number" id="input-width" value="960" min="100" max="3840">
+                <input type="number" id="input-width" value="960" min="100" max="15360">
             </div>
             <div>
                 <label for="input-height">Height (px)</label>
-                <input type="number" id="input-height" value="540" min="100" max="2160">
+                <input type="number" id="input-height" value="540" min="100" max="8640">
             </div>
         </div>
 
@@ -295,7 +301,10 @@
             </div>
         </details>
 
-        <button id="render-btn" style="padding: 15px;">Render Flag</button>
+        <div class="row" style="margin-top: 5px;">
+            <button id="render-btn" style="padding: 15px; flex: 1;">Render</button>
+            <button id="download-image-btn" style="padding: 15px; flex: 1;" disabled>Download</button>
+        </div>
         <div class="status" id="status-text">Ready</div>
     </div>
 
@@ -334,6 +343,7 @@
         };
 
         let currentColors = JSON.parse(JSON.stringify(PRESETS.material));
+        let hasWarnedHighRes = false;
 
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
@@ -342,6 +352,7 @@
         const widthInput = document.getElementById("input-width");
         const heightInput = document.getElementById("input-height");
         const renderBtn = document.getElementById("render-btn");
+        const downloadImageBtn = document.getElementById("download-image-btn");
         const statusText = document.getElementById("status-text");
 
         const jsonIoTextarea = document.getElementById("json-io");
@@ -450,7 +461,7 @@
             currentColors = data;
             presetSelect.value = "custom";
             updateColorListUI();
-            renderFlag();
+            renderWallpaper();
         }
 
         applyJsonBtn.addEventListener("click", () => {
@@ -505,11 +516,21 @@
             if (PRESETS[e.target.value]) {
                 currentColors = JSON.parse(JSON.stringify(PRESETS[e.target.value]));
                 updateColorListUI();
-                renderFlag();
+                renderWallpaper();
             }
         });
 
-        renderBtn.addEventListener("click", renderFlag);
+        renderBtn.addEventListener("click", renderWallpaper);
+
+        downloadImageBtn.addEventListener("click", () => {
+            const dataUrl = canvas.toDataURL("image/png");
+            const anchor = document.createElement("a");
+            anchor.href = dataUrl;
+            anchor.download = "voronoi-wallpaper.png";
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        });
 
         function hexToRgb(hex) {
             const bigint = parseInt(hex.replace("#", ""), 16);
@@ -536,7 +557,7 @@
             return (c1 * 2 + c2 * 1 + c3 * 1) / 4;
         }
 
-        function renderFlag() {
+        function renderWallpaper() {
             const width = parseInt(widthInput.value, 10);
             const height = parseInt(heightInput.value, 10);
 
@@ -544,8 +565,18 @@
                 return alert("Please enter valid width and height resolutions.");
             }
 
+            const pixelCount = width * height;
+            if (pixelCount > (1920 * 1080) && !hasWarnedHighRes) {
+                const proceed = confirm("Warning: Rendering high-resolution wallpapers may take a long time and could temporarily freeze your browser. Do you wish to proceed?");
+                if (!proceed) {
+                    return;
+                }
+                hasWarnedHighRes = true;
+            }
+
             statusText.innerText = "Rendering...";
             statusText.style.color = "#FF9800";
+            downloadImageBtn.disabled = true; // Disable download during render
 
             setTimeout(() => {
                 canvas.width = width;
@@ -599,11 +630,12 @@
                 ctx.putImageData(imageData, 0, 0);
                 statusText.innerText = `Done (${width}x${height})`;
                 statusText.style.color = "#8bc34a";
+                downloadImageBtn.disabled = false; // Re-enable download upon finish
             }, 20);
         }
 
         updateColorListUI();
-        renderFlag();
+        renderWallpaper();
     </script>
 </body>
 </html>
