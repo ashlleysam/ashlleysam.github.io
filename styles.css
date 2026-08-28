@@ -32,7 +32,6 @@
 
 html {
   scroll-behavior: smooth;
-
   background-image: 
     linear-gradient(to bottom, transparent 50%, var(--background-color) 50%),
     linear-gradient(135deg, var(--color-main-strong) 0%, var(--primary-color) 100%);
@@ -40,6 +39,10 @@ html {
   background-color: var(--background-color);
 }
 
+/* Ensure body does not overflow when menu is open */
+body.menu-open {
+  overflow: hidden;
+}
 
 html.theme-ready,
 body.theme-ready,
@@ -109,7 +112,7 @@ a:focus {
 
 .site-brand, 
 .site-brand a {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .site-brand h1 {
@@ -128,7 +131,7 @@ a:focus {
 .site-nav {
   position: sticky;
   top: 0;
-  z-index: 70;
+  z-index: 100; /* Increased to form a high stacking context for the overlay and menu */
   width: 100%;
   background: linear-gradient(135deg, var(--color-main-strong, var(--color-main)) 0%, var(--primary-color) 100%) fixed;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -140,9 +143,35 @@ a:focus {
   padding: 0.95rem 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
+}
+
+.nav-menu {
+  display: flex;
+  flex: 1 1 auto; /* Grow to fill space, pushing controls to the right */
+  align-items: center;
+}
+
+/* Hide hamburger and close buttons by default (Desktop) */
+.hamburger-menu,
+.close-menu {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: opacity 0.2s ease;
+}
+
+.hamburger-menu:hover,
+.close-menu:hover {
+  opacity: 0.8;
+}
+
+/* Hide mobile overlay by default */
+.menu-overlay {
+  display: none;
 }
 
 .site-nav ul {
@@ -151,9 +180,8 @@ a:focus {
   justify-content: center;
   gap: 0.75rem;
   list-style: none;
-  margin: 0;
+  margin: 0 auto; /* Center links in the available flex space */
   padding: 0;
-  flex: 1 1 auto;
 }
 
 .site-nav li {
@@ -190,6 +218,7 @@ a:focus {
   color: #ffffff !important;
   cursor: pointer;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .theme-toggle:hover,
@@ -566,31 +595,77 @@ iframe {
 }
 
 @media (max-width: 680px) {
+  /* Inherit position: sticky from the base .site-nav class */
+
+  main [id] {
+    /* Increased to account for the height of the sticky mobile nav */
+    scroll-margin-top: 80px;
+  }
+  
   .site-nav-container {
+    justify-content: flex-end;
+  }
+
+  .hamburger-menu {
+    display: block;
+  }
+  
+  .close-menu {
+    display: block;
+    align-self: flex-end;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Right-hand Sidebar Menu Styling */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--color-main-strong);
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
+    padding: 1.5rem 2rem;
+    gap: 1rem;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.35);
+  }
+
+  body.menu-open .nav-menu {
+    transform: translateX(0);
+  }
+
+  /* Dark Overlay configuration */
+  .menu-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 90;
+  }
+
+  body.menu-open .menu-overlay {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .site-nav ul {
     flex-direction: column;
     align-items: stretch;
+    margin-bottom: 1rem;
   }
 
   .site-nav li {
     width: 100%;
   }
 
-  .theme-toggle {
-    margin: 0 auto;
-    order: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 3rem; 
-    border-radius: 999px;
-  }
-  
   .button-row {
     flex-direction: column;
   }

@@ -52,15 +52,27 @@
     </div>
   </header>
   <nav class="site-nav" aria-label="Site navigation">
+    <div class="menu-overlay" aria-hidden="true" onclick="document.body.classList.remove('menu-open')"></div>
+    
     <div class="site-nav-container">
-      <ul>
-        <li class="nav-item section-link"><a href="#home">Home</a></li>
-        <li class="nav-item section-link"><a href="#about">About</a></li>
-        <li class="nav-item section-link"><a href="#research">Research</a></li>
-        <li class="nav-item section-link"><a href="#teaching">Teaching</a></li>
-        <li class="nav-item section-link"><a href="#talks">Talks</a></li>
-        <li class="nav-item page-link"><a href="fun/index.html">Fun</a></li>
-      </ul>
+      <div class="nav-menu">
+        <button class="close-menu" aria-label="Close Menu" onclick="document.body.classList.remove('menu-open')">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <ul>
+          <li class="nav-item section-link"><a href="#home" onclick="document.body.classList.remove('menu-open')">Home</a></li>
+          <li class="nav-item section-link"><a href="#about" onclick="document.body.classList.remove('menu-open')">About</a></li>
+          <li class="nav-item section-link"><a href="#research" onclick="document.body.classList.remove('menu-open')">Research</a></li>
+          <li class="nav-item section-link"><a href="#teaching" onclick="document.body.classList.remove('menu-open')">Teaching</a></li>
+          <li class="nav-item section-link"><a href="#talks" onclick="document.body.classList.remove('menu-open')">Talks</a></li>
+          <li class="nav-item page-link"><a href="fun/index.html">Fun</a></li>
+        </ul>
+      </div>
+
       <button class="theme-toggle" type="button" aria-label="Toggle theme">
         <svg class="theme-icon sun" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
           <circle cx="12" cy="12" r="5" />
@@ -68,6 +80,14 @@
         </svg>
         <svg class="theme-icon moon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" >
           <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <button class="hamburger-menu" aria-label="Open Menu" onclick="document.body.classList.add('menu-open')">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
     </div>
@@ -196,4 +216,3 @@
   </footer>
 </body>
 </html>
-
