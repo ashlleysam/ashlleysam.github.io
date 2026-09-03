@@ -1,6 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { SnackBar } from "./modules/js-snackbar.js";
 import { BTree } from "./btree.js";
+import { installCamera } from "./camera.js";
 
 const STORAGE_KEY = "d3_btree";
 const PADDING = 80;
@@ -23,6 +24,7 @@ let mouseY = 0;
 let canvasMouseX = 0;
 let canvasMouseY = 0;
 let viewBox = { x: 0, y: 0, width, height };
+let cameraUserAdjusted = false;
 let contextMenu;
 let indexDialog;
 let editDialog;
@@ -52,6 +54,7 @@ function showError(message) {
 }
 
 function fitToContent() {
+  if (cameraUserAdjusted) return;
   if (!tree.nodes.length) {
     viewBox = { x: 0, y: 0, width, height };
     svg.node().setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -96,6 +99,7 @@ function drawNode(nodeSelection) {
     .attr("class", "btree-data")
     .attr("y", node => -node.height / 4)
     .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "middle")
     .text(node => node.label);
   nodeSelection.each(function (node) {
     const cellWidth = node.width / Math.max(1, node.children.length);
@@ -338,6 +342,13 @@ function run() {
   document.querySelector("#menu-item-save-file").onclick = () => saveFile();
   document.querySelector("#menu-item-open-file").onclick = () => openFile();
   svg = d3.select("#d3_container").append("svg").attr("width", width).attr("height", height).attr("viewBox", `0 0 ${width} ${height}`).on("contextmenu", event => { showContextMenu(event); event.preventDefault(); });
+  installCamera({
+    svg,
+    getViewBox: () => viewBox,
+    setViewBox: nextViewBox => { viewBox = nextViewBox; },
+    resetView: () => { cameraUserAdjusted = false; fitToContent(); },
+    onChange: () => { cameraUserAdjusted = true; }
+  });
   nodes = svg.append("g").attr("class", "tree-layer");
   links = nodes;
   drawEdge = nodes.append("path").attr("class", "btree-link-preview");

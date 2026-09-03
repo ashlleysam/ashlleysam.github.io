@@ -6,6 +6,90 @@
   transition: opacity .1s cubic-bezier(0,0,.2,1);
 }
 
+.camera-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+}
+
+.camera-controls [data-camera="zoom-in"] {
+  margin-top: 2px;
+}
+
+.camera-controls button {
+  align-items: center;
+  background: #17212b;
+  border: 1px solid #52606d;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .28);
+  color: #f8f5ee;
+  cursor: pointer;
+  display: flex;
+  font-family: sans-serif;
+  font-size: 1.25rem;
+  height: 38px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 38px;
+  position: relative;
+}
+
+.camera-controls button:hover,
+.camera-controls button:focus-visible {
+  background: #f0b35b;
+  color: #17212b;
+  outline: none;
+}
+
+[data-tooltip]::after {
+  background: #17212b;
+  border: 1px solid #52606d;
+  border-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .28);
+  color: #f8f5ee;
+  content: attr(data-tooltip);
+  font-family: sans-serif;
+  font-size: .8rem;
+  font-weight: 400;
+  left: calc(100% + 8px);
+  line-height: 1.2;
+  opacity: 0;
+  padding: 6px 8px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity .15s linear;
+  transition-delay: 0s;
+  white-space: nowrap;
+  z-index: 30;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transition-delay: 2s;
+}
+
+.camera-controls [data-tooltip]::after {
+  left: auto;
+  right: calc(100% + 8px);
+}
+
+#d3_container svg {
+  cursor: grab;
+  touch-action: none;
+}
+
+#d3_container svg.camera-dragging {
+  cursor: grabbing;
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -52,25 +136,28 @@ html, body {
 #fullscreen-button {
   align-items: center;
   background: #17212b;
-  border: 1px solid #f0b35b;
+  border: 1px solid #52606d;
   border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .28);
   bottom: 18px;
   color: #f8f5ee;
   cursor: pointer;
   display: flex;
-  font-size: 1.4rem;
-  height: 48px;
+  font-family: sans-serif;
+  font-size: 1.25rem;
+  height: 38px;
   justify-content: center;
   left: 18px;
   line-height: 1;
   padding: 0;
   position: fixed;
-  width: 48px;
+  width: 38px;
   z-index: 10;
 }
 
 #fullscreen-button:hover, #fullscreen-button:focus-visible {
-  border-color: #f0b35b;
+  background: #f0b35b;
+  color: #17212b;
   outline: none;
 }
 
@@ -383,7 +470,7 @@ html, body {
 .btree-data, .btree-array text {
   fill: #17212b;
   font-family: sans-serif;
-  font-size: 18px;
+  font-size: 28px;
   pointer-events: none;
 }
 

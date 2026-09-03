@@ -1,6 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { SnackBar } from "./modules/js-snackbar.js";
 import { Graph } from "./graph.js";
+import { installCamera } from "./camera.js";
 
 const ESCAPE = "Escape";
 const RED = "red";
@@ -39,6 +40,7 @@ let data_menu, data_input, none_button, red_button, black_button, circle_button,
 let mouseX, mouseY = null;
 let canvasMouseX, canvasMouseY = null;
 let viewBox = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+let cameraUserAdjusted = false;
 
 function readStateStorage() {
   try {
@@ -315,6 +317,7 @@ function enable_edit_menu() {
 }
 
 function fitToContent() {
+  if (cameraUserAdjusted) return;
   const nodes = graph ? graph.nodes : [];
   if (nodes.length === 0) {
     viewBox = { x: 0, y: 0, width, height };
@@ -631,6 +634,13 @@ function run() {
       showContextMenu(e);
       e.preventDefault();
     });
+  installCamera({
+    svg,
+    getViewBox: () => viewBox,
+    setViewBox: nextViewBox => { viewBox = nextViewBox; },
+    resetView: () => { cameraUserAdjusted = false; fitToContent(); },
+    onChange: () => { cameraUserAdjusted = true; }
+  });
 
   graph = new Graph(
     [
