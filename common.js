@@ -12,15 +12,26 @@ const themeVariables = {
 
 let themes = { light: null, dark: null };
 
-function siteRoot() {
-  return new URL(document.body.dataset.siteRoot || (window.location.pathname.includes('/fun/') ? '../' : './'), document.baseURI);
+const siteRootUrl = new URL('./', import.meta.url);
+
+function relativeUrl(target) {
+  const pageDirectory = new URL('./', window.location.href);
+  const targetUrl = new URL(target, siteRoot());
+  const fromParts = pageDirectory.pathname.split('/').filter(Boolean);
+  const targetParts = targetUrl.pathname.split('/').filter(Boolean);
+  let commonParts = 0;
+  while (commonParts < fromParts.length && commonParts < targetParts.length && fromParts[commonParts] === targetParts[commonParts]) {
+    commonParts += 1;
+  }
+  const path = `${'../'.repeat(fromParts.length - commonParts)}${targetParts.slice(commonParts).join('/')}`;
+  return `${path || './'}${targetUrl.search}${targetUrl.hash}`;
 }
 
-function renderSiteChrome() {
-  const inFunPage = window.location.pathname.includes('/fun/');
-  const home = (section) => inFunPage ? `../index.html#${section}` : `#${section}`;
-  const fun = inFunPage ? 'index.html' : 'fun/index.html';
+function siteRoot() {
+  return new URL(document.body.dataset.siteRoot || siteRootUrl, document.baseURI);
+}
 
+async function renderSiteChrome() {
   const headerTarget = document.querySelector('[data-site-header]') || document.querySelector('.site-header');
   headerTarget.outerHTML = `
     <header class="site-header">
@@ -31,32 +42,13 @@ function renderSiteChrome() {
     </header>`;
 
   const navTarget = document.querySelector('[data-site-nav]') || document.querySelector('.site-nav');
-  navTarget.outerHTML = `
-    <nav class="site-nav" aria-label="Site navigation">
-      <div class="menu-overlay" aria-hidden="true"></div>
-      <div class="site-nav-container">
-        <div class="nav-menu">
-          <button class="close-menu" aria-label="Close Menu">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-          <ul>
-            <li class="nav-item section-link"><a href="${home('home')}">Home</a></li>
-            <li class="nav-item section-link"><a href="${home('about')}">About</a></li>
-            <li class="nav-item section-link"><a href="${home('research')}">Research</a></li>
-            <li class="nav-item section-link"><a href="${home('teaching')}">Teaching</a></li>
-            <li class="nav-item section-link"><a href="${home('talks')}">Talks</a></li>
-            <li class="nav-item page-link"><a href="${fun}">Fun</a></li>
-          </ul>
-        </div>
-        <button class="theme-toggle" type="button" aria-label="Toggle theme">
-          <svg class="theme-icon sun" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l-1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-          <svg class="theme-icon moon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 1 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-        </button>
-        <button class="hamburger-menu" aria-label="Open Menu">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-      </div>
-    </nav>`;
+  const navResponse = await fetch(new URL('nav.html', siteRoot()));
+  if (!navResponse.ok) throw new Error('Unable to load navigation');
+  navTarget.outerHTML = await navResponse.text();
+  const nav = document.querySelector('.site-nav');
+  nav.querySelectorAll('[data-nav-target]').forEach((link) => {
+    link.href = relativeUrl(link.dataset.navTarget);
+  });
 
   const footerTarget = document.querySelector('[data-site-footer]');
   if (footerTarget) {
@@ -130,7 +122,7 @@ function activateNavigation() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  renderSiteChrome();
+  await renderSiteChrome();
   await loadThemeConfigs();
   applyTheme(localStorage.getItem('site-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   initializeThemeToggle();
