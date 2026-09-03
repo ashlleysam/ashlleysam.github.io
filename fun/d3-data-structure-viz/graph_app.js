@@ -13,6 +13,7 @@ const TEXT_COLOR_MAP = new Map([[RED, "white"], [BLACK, "white"], [NONE, "black"
 const BORDER_COLOR_MAP = new Map([[RED, "black"], [BLACK, "white"], [NONE, "black"]]);
 const RADIUS = 50;
 const NODE_SEP = 200;
+const STATE_STORAGE_KEY = "d3_graph";
 
 let node_selected_id = null;
 let node_hover_id = null;
@@ -36,6 +37,24 @@ let graph = null;
 let g_link, link, g_misc, draw_edge, g_node, node, circles, triangles, text = null;
 let data_menu, data_input, none_button, red_button, black_button, circle_button, triangle_button = null;
 let mouseX, mouseY = null;
+let canvasMouseX, canvasMouseY = null;
+let viewBox = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+
+function readStateStorage() {
+  try {
+    return window.localStorage.getItem(STATE_STORAGE_KEY);
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveState() {
+  try {
+    window.localStorage.setItem(STATE_STORAGE_KEY, graph.stringify());
+  } catch (error) {
+    console.warn("Unable to persist graph state.", error);
+  }
+}
 
 async function saveFile(blob, suggestedName) {
   // Feature detection. The API needs to be supported
@@ -228,6 +247,7 @@ function redraw() {
     .on("mouseover", edge_onmouseover)
     .on("mouseout", edge_onmouseout)
     .merge(update_links);
+  saveState();
 }
 
 function showContextMenu(e) {
@@ -272,6 +292,7 @@ function setSelectedColor(color) {
       .attr("stroke", d => BORDER_COLOR_MAP.get(d.color))
       .attr("stroke-width", d => d.selected ? "4px" : "1px");
     text.attr("fill", d => TEXT_COLOR_MAP.get(d.color));
+    saveState();
   };
 }
 
@@ -293,15 +314,48 @@ function enable_edit_menu() {
   data_menu.style = "position: absolute; left:5%; top:5%;";
 }
 
+function fitToContent() {
+  const nodes = graph ? graph.nodes : [];
+  if (nodes.length === 0) {
+    viewBox = { x: 0, y: 0, width, height };
+    svg.node().setAttribute("viewBox", `0 0 ${width} ${height}`);
+    return;
+  }
+
+  const padding = RADIUS * 1.5;
+  const minX = Math.min(...nodes.map(d => d.x - d.r)) - padding;
+  const maxX = Math.max(...nodes.map(d => d.x + d.r)) + padding;
+  const minY = Math.min(...nodes.map(d => d.y - d.r)) - padding;
+  const maxY = Math.max(...nodes.map(d => d.y + d.r)) + padding;
+  const contentWidth = maxX - minX;
+  const contentHeight = maxY - minY;
+  const scale = Math.min(1, width / contentWidth, height / contentHeight);
+
+  viewBox = {
+    x: (minX + maxX - width / scale) / 2,
+    y: (minY + maxY - height / scale) / 2,
+    width: width / scale,
+    height: height / scale
+  };
+  svg.node().setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+}
+
+function updateMousePosition(event) {
+  [mouseX, mouseY] = d3.pointer(event);
+  canvasMouseX = viewBox.x + mouseX * viewBox.width / width;
+  canvasMouseY = viewBox.y + mouseY * viewBox.height / height;
+}
+
 function tick() {
   link.attr("d", d => drawChildLink(d))
   node.attr("transform", d => `translate(${d.x},${d.y})`);
+  fitToContent();
 
   if (edge_start_id == null) {
     draw_edge.attr("d", "");
   } else {
     let edge_start = graph.getNodeById(edge_start_id);
-    draw_edge.attr("d", `M ${edge_start.x},${edge_start.y} L ${mouseX},${mouseY}`);
+    draw_edge.attr("d", `M ${edge_start.x},${edge_start.y} L ${canvasMouseX},${canvasMouseY}`);
   }
 }
 
@@ -312,7 +366,7 @@ function randIntRange(min, max) {
 }
 
 function addNode() {
-  const node = graph.addNode(mouseX, mouseY, RADIUS, NONE, "circle", randIntRange(1, 100));
+  const node = graph.addNode(canvasMouseX, canvasMouseY, RADIUS, NONE, "circle", randIntRange(1, 100));
   if (node_selected_id !== null) {
     graph.getNodeById(node_selected_id).selected = false;
   }
@@ -572,6 +626,7 @@ function run() {
     .append("svg")
     .attr("width", width)
     .attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
     .on("contextmenu", function (e) {
       showContextMenu(e);
       e.preventDefault();
@@ -598,6 +653,16 @@ function run() {
       { id: 6, source: 5, target: 7, label: "right", selected: false },
     ],
     width, height, NODE_SEP, tick);
+
+  const savedState = readStateStorage();
+  if (savedState) {
+    try {
+      graph.simulation.stop();
+      graph = Graph.fromString(savedState, width, height, tick);
+    } catch (error) {
+      window.localStorage.removeItem(STATE_STORAGE_KEY);
+    }
+  }
 
   window.onresize = function () {
     width = window.innerWidth;
@@ -667,6 +732,7 @@ function run() {
     if (node_selected_id == null) return;
     graph.getNodeById(node_selected_id).label = data_input.value;
     text.text(d => d.label);
+    saveState();
   };
   data_input.value = "";
   none_button = document.getElementById("noneButton");
@@ -708,7 +774,7 @@ function run() {
       }
     })
     .on('mousemove', function (e) {
-      [mouseX, mouseY] = d3.pointer(e);
+      updateMousePosition(e);
     })
     .on("click", function (e) {
       // This event is triggered for Safari on right clicks
@@ -738,6 +804,7 @@ function run() {
         draw_edge.attr("d", "");
       }
     });
+    fitToContent();
 }
 
 run();

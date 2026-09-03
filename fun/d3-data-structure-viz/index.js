@@ -14,6 +14,7 @@ const BORDER_COLOR_MAP = new Map([[RED, "black"], [BLACK, "white"], [NONE, "blac
 const RADIUS = 50;
 const NODE_SEP_X = 110;
 const NODE_SEP_Y = 130;
+const STATE_STORAGE_KEY = "d3_binary_tree";
 
 let node_selected_id = null;
 let node_hover_id = null;
@@ -39,6 +40,24 @@ let tree = null;
 let g_link, link, g_misc, draw_edge, g_node, node, circles, triangles, text = null;
 let data_menu, data_input, none_button, red_button, black_button, circle_button, triangle_button = null;
 let mouseX, mouseY = null;
+let canvasMouseX, canvasMouseY = null;
+let viewBox = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+
+function readStateStorage() {
+  try {
+    return window.localStorage.getItem(STATE_STORAGE_KEY);
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveState() {
+  try {
+    window.localStorage.setItem(STATE_STORAGE_KEY, tree.stringify());
+  } catch (error) {
+    console.warn("Unable to persist binary tree state.", error);
+  }
+}
 
 async function saveFile(blob, suggestedName) {
   // Feature detection. The API needs to be supported
@@ -231,6 +250,7 @@ function redraw() {
     .on("mouseover", edge_onmouseover)
     .on("mouseout", edge_onmouseout)
     .merge(update_links);
+  saveState();
 }
 
 function showContextMenu(e) {
@@ -282,6 +302,7 @@ function setSelectedColor(color) {
       .attr("stroke", d => BORDER_COLOR_MAP.get(d.color))
       .attr("stroke-width", d => d.selected ? "4px" : "1px");
     text.attr("fill", d => TEXT_COLOR_MAP.get(d.color));
+    saveState();
   };
 }
 
@@ -303,15 +324,48 @@ function enable_edit_menu() {
   data_menu.style = "position: absolute; left:5%; top:5%;";
 }
 
+function fitToContent() {
+  const nodes = tree ? tree.nodes : [];
+  if (nodes.length === 0) {
+    viewBox = { x: 0, y: 0, width, height };
+    svg.node().setAttribute("viewBox", `0 0 ${width} ${height}`);
+    return;
+  }
+
+  const padding = RADIUS * 1.5;
+  const minX = Math.min(...nodes.map(d => d.x - d.r)) - padding;
+  const maxX = Math.max(...nodes.map(d => d.x + d.r)) + padding;
+  const minY = Math.min(...nodes.map(d => d.y - d.r)) - padding;
+  const maxY = Math.max(...nodes.map(d => d.y + d.r)) + padding;
+  const contentWidth = maxX - minX;
+  const contentHeight = maxY - minY;
+  const scale = Math.min(1, width / contentWidth, height / contentHeight);
+
+  viewBox = {
+    x: (minX + maxX - width / scale) / 2,
+    y: (minY + maxY - height / scale) / 2,
+    width: width / scale,
+    height: height / scale
+  };
+  svg.node().setAttribute("viewBox", `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+}
+
+function updateMousePosition(event) {
+  [mouseX, mouseY] = d3.pointer(event);
+  canvasMouseX = viewBox.x + mouseX * viewBox.width / width;
+  canvasMouseY = viewBox.y + mouseY * viewBox.height / height;
+}
+
 function tick() {
   link.attr("d", d => drawChildLink(d))
   node.attr("transform", d => `translate(${d.x},${d.y})`);
+  fitToContent();
 
   if (edge_start_id == null) {
     draw_edge.attr("d", "");
   } else {
     let edge_start = tree.getNodeById(edge_start_id);
-    draw_edge.attr("d", `M ${edge_start.x},${edge_start.y} Q${mouseX},${edge_start.y} ${mouseX},${mouseY}`);
+    draw_edge.attr("d", `M ${edge_start.x},${edge_start.y} Q${canvasMouseX},${edge_start.y} ${canvasMouseX},${canvasMouseY}`);
   }
 }
 
@@ -322,7 +376,7 @@ function randIntRange(min, max) {
 }
 
 function addNode() {
-  const node = tree.addNode(mouseX, mouseY, RADIUS, NONE, "circle", randIntRange(1, 100));
+  const node = tree.addNode(canvasMouseX, canvasMouseY, RADIUS, NONE, "circle", randIntRange(1, 100));
   if (node_selected_id !== null) {
     tree.getNodeById(node_selected_id).selected = false;
   }
@@ -604,6 +658,7 @@ function run() {
     .append("svg")
     .attr("width", width)
     .attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
     .on("contextmenu", function (e) {
       showContextMenu(e);
       e.preventDefault();
@@ -630,6 +685,16 @@ function run() {
       { id: 6, parent: 5, child: 7, label: "right", selected: false },
     ],
     width, height, 0.1, NODE_SEP_X, NODE_SEP_Y, tick);
+
+  const savedState = readStateStorage();
+  if (savedState) {
+    try {
+      tree.simulation.stop();
+      tree = BinaryTree.fromString(savedState, width, height, tick);
+    } catch (error) {
+      window.localStorage.removeItem(STATE_STORAGE_KEY);
+    }
+  }
 
   window.onresize = function () {
     width = window.innerWidth;
@@ -700,6 +765,7 @@ function run() {
     if (node_selected_id == null) return;
     tree.getNodeById(node_selected_id).label = data_input.value;
     text.text(d => d.label);
+    saveState();
   };
   data_input.value = "";
   none_button = document.getElementById("noneButton");
@@ -762,7 +828,7 @@ function run() {
       }
     })
     .on('mousemove', function (e) {
-      [mouseX, mouseY] = d3.pointer(e);
+      updateMousePosition(e);
     })
     .on("click", function (e) {
       // This event is triggered for Safari on right clicks
@@ -793,6 +859,7 @@ function run() {
         draw_edge.attr("d", "");
       }
     });
+    fitToContent();
 }
 
 run();
