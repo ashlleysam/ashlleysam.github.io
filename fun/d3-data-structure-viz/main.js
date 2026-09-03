@@ -6,6 +6,10 @@ const views = {
   graph: {
     label: "Graph",
     source: "graph.html?v=5"
+  },
+  btree: {
+    label: "B-tree",
+    source: "btree.html?v=8"
   }
 };
 

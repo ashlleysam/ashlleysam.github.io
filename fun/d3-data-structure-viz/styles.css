@@ -331,6 +331,77 @@ html, body {
   transition: stroke-width 0.1s, stroke 0.1s;
 }
 
+.btree-context-menu {
+  display: none;
+  width: 300px;
+}
+
+.btree-index-dialog {
+  background: #fff;
+  border: 2px solid #17212b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+  display: none;
+  gap: 10px;
+  left: 50%;
+  padding: 16px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+}
+
+.btree-index-dialog input {
+  min-width: 100px;
+}
+
+.btree-index-dialog div {
+  display: flex;
+  gap: 8px;
+}
+
+.btree-node {
+  cursor: pointer;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .2));
+}
+
+.btree-node-shape {
+  stroke: #17212b;
+  stroke-width: 2px;
+}
+
+.btree-node-shape.btree-selected {
+  stroke: #f0b35b;
+  stroke-width: 5px;
+}
+
+.btree-divider, .btree-array rect {
+  fill: none;
+  stroke: #17212b;
+  stroke-width: 1px;
+}
+
+.btree-data, .btree-array text {
+  fill: #17212b;
+  font-family: sans-serif;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.btree-array text {
+  font-size: 15px;
+}
+
+.btree-link, .btree-link-preview {
+  fill: none;
+  stroke: #17212b;
+  stroke-width: 5px;
+}
+
+.btree-link-selected {
+  stroke: #6716ea;
+  stroke-width: 8px;
+}
+
 .material-radio > input:disabled {
     opacity: 0;
 }

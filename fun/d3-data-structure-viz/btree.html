@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B-Tree Editor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./modules/js-snackbar.css">
+  <script type="module" src="btree_app.js?v=8"></script>
+</head>
+<body style="height: 100%; overflow: hidden;">
+  <div id="data_playground">
+    <div id="contextMenu" class="menu-popup" style="width: 0px; left: 658px; top: 188px; display: none;">
+      <div class="menu-panel">
+        <div class="menu-item" id="menu-item-add-node"><div class="menu-item-icon"><img src="../../images/add.svg" alt="Add"></div><div class="menu-item-label">Add node</div></div>
+        <div class="menu-item" id="menu-item-edit-node" style="display: none;"><div class="menu-item-icon"><img src="../../images/edit.svg" alt="Edit"></div><div class="menu-item-label">Edit node</div></div>
+        <div class="menu-item" id="menu-item-delete-node"><div class="menu-item-icon"><img src="../../images/delete.svg" alt="Delete"></div><div class="menu-item-label">Delete node</div></div>
+        <div class="menu-item" id="menu-item-delete-edge" style="display: none;"><div class="menu-item-icon"><img src="../../images/delete.svg" alt="Delete edge"></div><div class="menu-item-label">Delete edge</div></div>
+        <div class="menu-item" id="menu-item-leftmost-child"><div class="menu-item-icon"><img src="../../images/child_left.svg" alt="Leftmost child"></div><div class="menu-item-label">Set leftmost child</div></div>
+        <div class="menu-item" id="menu-item-middle-child"><div class="menu-item-icon"><img src="../../images/new_edge.svg" alt="Middle child"></div><div class="menu-item-label">Set middle child...</div></div>
+        <div class="menu-item" id="menu-item-rightmost-child"><div class="menu-item-icon"><img src="../../images/child_right.svg" alt="Rightmost child"></div><div class="menu-item-label">Set rightmost child</div></div>
+        <div class="menu-item" id="menu-item-save-file"><div class="menu-item-icon"><img src="../../images/save.svg" alt="Save file"></div><div class="menu-item-label">Save file</div></div>
+        <div class="menu-item" id="menu-item-open-file"><div class="menu-item-icon"><img src="../../images/open_file.svg" alt="Open file"></div><div class="menu-item-label">Open file</div></div>
+        <div class="menu-item" id="menu-item-clear-all"><div class="menu-item-icon"><img src="../../images/delete_all.svg" alt="Clear all"></div><div class="menu-item-label">Clear all</div></div>
+      </div>
+    </div>
+    <div id="d3_container"></div>
+    <form id="index-dialog" class="btree-index-dialog">
+      <label for="child-index">Child array index</label>
+      <input id="child-index" type="number" min="0" step="1" value="0" required>
+      <div><button type="submit">Set child</button><button type="button" id="cancel-index">Cancel</button></div>
+    </form>
+    <form id="edit-dialog" class="btree-index-dialog">
+      <label for="node-data">Node data</label>
+      <input id="node-data" type="text" required>
+      <div><button type="submit">Save</button><button type="button" id="cancel-edit">Cancel</button></div>
+    </form>
+  </div>
+</body>
+</html>
