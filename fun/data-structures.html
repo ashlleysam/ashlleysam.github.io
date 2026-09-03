@@ -4,54 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ashley Samuelson | Data Structure Playground</title>
-<script>
-    try {
-      const storedTheme = localStorage.getItem('site-theme');
-      const cachedConfig = localStorage.getItem('site-theme-config');
-      
-      if (storedTheme === 'dark') {
-        document.documentElement.classList.add('dark-mode');
-      } else if (storedTheme === 'light') {
-        document.documentElement.classList.add('light-mode');
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark-mode');
-      }
-
-      if (cachedConfig) {
-        const config = JSON.parse(cachedConfig);
-        const root = document.documentElement;
-        root.style.setProperty('--primary-color', config.primary);
-        root.style.setProperty('--secondary-color', config.secondary);
-        root.style.setProperty('--accent-color', config.accent);
-        root.style.setProperty('--background-color', config.background);
-        root.style.setProperty('--surface-color', config.surface);
-        root.style.setProperty('--text-color', config.text);
-        root.style.setProperty('--muted-color', config.muted);
-        root.style.setProperty('--border-color', config.border);
-        root.style.setProperty('--nav-text-color', config.navText);
-        root.style.setProperty('--color-main', config.primary);
-        root.style.setProperty('--color-secondary', config.secondary);
-        root.style.setProperty('--color-accent', config.accent);
-        root.style.setProperty('--color-background', config.background);
-        root.style.setProperty('--color-surface', config.surface);
-        root.style.setProperty('--color-text', config.text);
-        root.style.setProperty('--color-muted', config.muted);
-        root.style.setProperty('--color-border', config.border);
-        if (config.font) root.style.setProperty('--font-family', config.font);
-      }
-    } catch (e) {}
-  </script>
+  <script src="../theme-init.js"></script>
   <link rel="stylesheet" href="../styles.css" />
   <script type="module" src="../common.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header" data-site-header>
     <div class="site-brand">
       <h1>Ashley Samuelson</h1>
       <p>Computer Science Ph.D. Candidate | UW-Madison</p>
     </div>
   </header>
-  <nav class="site-nav" aria-label="Site navigation">
+  <nav class="site-nav" aria-label="Site navigation" data-site-nav>
     <div class="menu-overlay" aria-hidden="true" onclick="document.body.classList.remove('menu-open')"></div>
     
     <div class="site-nav-container">
